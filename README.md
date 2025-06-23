@@ -18,3 +18,15 @@ apply the key to your config
   key_name               = "my-keypair"
 ```
 
+## Launch Instance 
+
+`terraform apply` to launches the instance
+
+`terraform destroy` destroys the instance 
+
+
+## SSH into instance
+Use your keypair generated in the previous step to ssh into the instance
+```
+ssh -i ~/.ssh/aws-keypair.pem -X ubuntu@<ip-address>
+```
