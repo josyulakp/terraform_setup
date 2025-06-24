@@ -18,6 +18,9 @@ resource "aws_subnet" "main" {
   map_public_ip_on_launch = true
 }
 
+# Data source to get the caller's identity (includes account ID)
+data "aws_caller_identity" "current" {}
+
 # Internet Gateway
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
@@ -60,6 +63,46 @@ resource "aws_security_group" "allow_ssh" {
   }
 }
 
+# IAM Role
+resource "aws_iam_role" "ec2_role" {
+  name = "ec2_s3_access_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Sid    = "AllowEC2ToAssumeRole",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Sid    = "AllowUserToAssumeRole",
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/KrishnaJosyula"
+        }
+      }
+    ]
+  })
+}
+
+# Attach S3 access policy (full access)
+resource "aws_iam_role_policy_attachment" "s3_access" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+# Instance Profile
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "ec2_instance_profile"
+  role = aws_iam_role.ec2_role.name
+}
+
+
 # EC2 Instance (update your resource to use subnet and security group)
 resource "aws_instance" "app_server" {
   ami                    = "ami-020cba7c55df1f615"
@@ -67,6 +110,8 @@ resource "aws_instance" "app_server" {
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.allow_ssh.id]
   key_name               = "aws-keypair"
+
+  iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
 
   tags = {
     Name = "MicroInstance"

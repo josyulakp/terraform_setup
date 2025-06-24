@@ -30,3 +30,19 @@ Use your keypair generated in the previous step to ssh into the instance
 ```
 ssh -i ~/.ssh/aws-keypair.pem -X ubuntu@<ip-address>
 ```
+
+## Writing to the S3 bucket 
+```
+ import boto3
+ from boto3.s3.transfer import TransferConfig
+ s3 = boto3.client('s3') 
+ s3.upload_file("/home/ubuntu/testfile.txt", "pr-checkpoints" , "testfile.txt")
+ ````
+
+```
+####delete the file
+ response = s3.delete_object(
+     Bucket='pr-checkpoints',
+     Key='testfile.txt')
+```
+
