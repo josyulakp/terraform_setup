@@ -20,6 +20,23 @@ apply the key to your config
 
 ## Launch Instance 
 
+This code launches micro instance. If you need another type of instance find the AMI and instance type from AWS console. 
+```
+# EC2 Instance (update your resource to use subnet and security group)
+resource "aws_instance" "app_server" {
+  ami                    = "ami-020cba7c55df1f615"
+  instance_type          = "t2.micro"
+  subnet_id              = aws_subnet.main.id
+  vpc_security_group_ids = [aws_security_group.allow_ssh.id]
+  key_name               = "aws-keypair"
+
+  iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+
+  tags = {
+    Name = "MicroInstance"
+  }
+}
+```
 `terraform apply` to launches the instance
 
 `terraform destroy` destroys the instance 
