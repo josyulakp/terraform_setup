@@ -109,7 +109,7 @@ resource "aws_instance" "app_server" {
   instance_type          = "g6.xlarge"
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.allow_ssh.id]
-  key_name               = "aws-keypair"
+  key_name               = "apsouthkey"
 
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
 
