@@ -94,3 +94,35 @@ aws ec2 describe-images \
   --query 'Images[*].[ImageId,Name]' \
   --output table 
   ```
+
+
+## Modify Volume Size on Running Instance 
+Get volume id from `https://ap-south-1.console.aws.amazon.com/ec2/home?region=ap-south-1#Volumes:` 
+
+```
+aws ec2 modify-volume --volume-id vol-xxxxxxxx --size <NEW_SIZE_IN_GB>
+```
+
+
+## Tips:
+
+1. Always switch to the storage provided by the EC2 Instance provide conda prefix 
+`conda create --prefix /your/custom/path/myenv python=3.10` 
+
+2. Change conda cache dir 
+```
+touch ~/.condarc
+
+vim ~/.condarc
+
+pkgs_dirs:
+  - /opt/conda_cache  # or another fast drive
+
+```
+
+3. Install nvtop 
+
+```
+sudo add-apt-repository ppa:quentiumyt/nvtop
+sudo apt install nvtop
+```

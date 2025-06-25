@@ -113,6 +113,13 @@ resource "aws_instance" "app_server" {
 
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
 
+
+  root_block_device {
+    volume_size = 100  # Size in GB
+    volume_type = "gp3"
+    delete_on_termination = true
+  }
+
   tags = {
     Name = "L40Instance"
   }
