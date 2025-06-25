@@ -2,7 +2,7 @@
 
 provider "aws" {
     profile = "default" 
-    region = "us-east-1" 
+    region = "ap-south-1" 
 }
 
 # VPC
@@ -14,7 +14,7 @@ resource "aws_vpc" "main" {
 resource "aws_subnet" "main" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.1.0/24"
-  availability_zone       = "us-east-1a"
+  availability_zone       = "ap-south-1a"
   map_public_ip_on_launch = true
 }
 
@@ -105,8 +105,8 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 
 # EC2 Instance (update your resource to use subnet and security group)
 resource "aws_instance" "app_server" {
-  ami                    = "ami-020cba7c55df1f615"
-  instance_type          = "t2.micro"
+  ami                    = "ami-0140f55e7363d9486"
+  instance_type          = "g6.xlarge"
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.allow_ssh.id]
   key_name               = "aws-keypair"
@@ -114,7 +114,7 @@ resource "aws_instance" "app_server" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
 
   tags = {
-    Name = "MicroInstance"
+    Name = "L40Instance"
   }
 }
 

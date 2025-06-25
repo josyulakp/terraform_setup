@@ -36,11 +36,32 @@ resource "aws_instance" "app_server" {
     Name = "MicroInstance"
   }
 }
+
 ```
 `terraform apply` to launches the instance
 
 `terraform destroy` destroys the instance 
 
+
+1. If something doesnt work 
+
+```
+terraform refresh
+
+terraform destroy
+``` 
+
+2. check if key pair is in the correct region
+
+```
+aws ec2 describe-key-pairs --region <us-east-1> --key-names aws-keypair 
+```
+If it doesnt make the key pair in the correct region
+
+```
+   aws ec2 create-key-pair --region ap-south-1 --key-name aws-keypair --query 'KeyMaterial' --output text > ~/.ssh/aws-keypair.pem
+   chmod 400 ~/.ssh/aws-keypair.pem
+```
 
 ## SSH into instance
 Use your keypair generated in the previous step to ssh into the instance
@@ -63,3 +84,13 @@ ssh -i ~/.ssh/aws-keypair.pem -X ubuntu@<ip-address>
      Key='testfile.txt')
 ```
 
+## Find AMI from AWS-cli 
+
+```
+aws ec2 describe-images \
+  --region ap-south-1 \
+  --owners amazon \
+  --filters "Name=name,Values=*Deep Learning*" "Name=state,Values=available" \
+  --query 'Images[*].[ImageId,Name]' \
+  --output table 
+  ```
