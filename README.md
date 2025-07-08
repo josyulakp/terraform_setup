@@ -126,3 +126,102 @@ pkgs_dirs:
 sudo add-apt-repository ppa:quentiumyt/nvtop
 sudo apt install nvtop
 ```
+
+4. AWS IAM User Management for EC2 access 
+ - Create a new user by navigating into AWS Console with root account 
+ - Assign the InternEC2 policy 
+
+ ```
+ {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:SendCommand",
+                "ssm:StartSession",
+                "ssm:TerminateSession",
+                "ssm:GetCommandInvocation",
+                "ssm:DescribeInstanceInformation",
+                "ec2:DescribeInstances"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+
+```
+ - Assign s3 bucket access policy  
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "EnableS3access",
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "*"
+        }
+    ]
+}
+```
+ - In main.tf to allow ssh with public key access add for each user 
+
+ ```
+ resource "aws_iam_policy" "ec2_instance_connect" {
+  name        = "EC2InstanceConnectPolicy"
+  description = "Allow EC2 Instance Connect for a specific user"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "ec2-instance-connect:SendSSHPublicKey",
+        Resource = "arn:aws:ec2:ap-south-1:<arn_user_id>:instance/${aws_instance.app_server.id}",
+        Condition = {
+          StringEquals = {
+            "ec2:osuser" = "ubuntu"
+          }
+        }
+      }
+    ]
+  })
+}
+```
+
+```
+resource "aws_iam_user_policy_attachment" "attach_ec2_instance_connect" {
+  user       = "<arn_username>" # Replace with your IAM user name
+  policy_arn = aws_iam_policy.ec2_instance_connect.arn
+}
+```
+
+
+# User Login Procedure 
+
+- Make the key read only 
+
+```
+chmod 400 <path_to_aws_private_key>
+```
+ 
+- Send the public key to the AWS instance 
+
+```
+    aws ec2-instance-connect send-ssh-public-key \
+
+    --instance-id <instance_id>  \
+
+    --availability-zone ap-south-1a \ 
+
+    --instance-os-user ubuntu \
+
+    --ssh-public-key <your_public_awskey>
+``` 
+ 
+- Login with the key 
+
+```
+ssh ubuntu@<public_ip> -i <path_to_aws_private_key>
+``` 

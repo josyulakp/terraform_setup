@@ -105,8 +105,8 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 
 # EC2 Instance (update your resource to use subnet and security group)
 resource "aws_instance" "app_server" {
-  ami                    = "ami-0140f55e7363d9486"
-  instance_type          = "g6.xlarge"
+  ami                    =  "ami-021a584b49225376d" #"ami-0140f55e7363d9486"
+  instance_type          =  "t2.micro" #"g6.xlarge"
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.allow_ssh.id]
   key_name               = "apsouthkey"
@@ -128,4 +128,35 @@ resource "aws_instance" "app_server" {
 output "instance_public_ip" {
   description = "The public IP address of the EC2 instance."
   value       = aws_instance.app_server.public_ip
+}
+
+output "instance_id"{ 
+  description = "Instance id of the EC2 instance" 
+  value = aws_instance.app_server.id
+}
+
+resource "aws_iam_policy" "ec2_instance_connect" {
+  name        = "EC2InstanceConnectPolicy"
+  description = "Allow EC2 Instance Connect for a specific user"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "ec2-instance-connect:SendSSHPublicKey",
+        Resource = "arn:aws:ec2:ap-south-1:145216744769:instance/${aws_instance.app_server.id}",
+        Condition = {
+          StringEquals = {
+            "ec2:osuser" = "ubuntu"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_user_policy_attachment" "attach_ec2_instance_connect" {
+  user       = "JeeveshM" # Replace with your IAM user name
+  policy_arn = aws_iam_policy.ec2_instance_connect.arn
 }
