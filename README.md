@@ -225,3 +225,14 @@ chmod 400 <path_to_aws_private_key>
 ```
 ssh ubuntu@<public_ip> -i <path_to_aws_private_key>
 ``` 
+
+5. OneDrive direct download 
+
+- Upload a file to OneDrive and after setting the access to public you can download it with appending `&download=1` 
+
+- Download on AWS EC2 Instance with: 
+
+```
+wget  "<link>&download=1"
+```
+
