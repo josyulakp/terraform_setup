@@ -104,6 +104,35 @@ aws ec2 modify-volume --volume-id vol-xxxxxxxx --size <NEW_SIZE_IN_GB>
 ```
 
 
+
+## User Login Procedure 
+
+- Make the key read only 
+
+```
+chmod 400 <path_to_aws_private_key>
+```
+ 
+- Send the public key to the AWS instance 
+
+```
+    aws ec2-instance-connect send-ssh-public-key \
+
+    --instance-id <instance_id>  \
+
+    --availability-zone ap-south-1a \ 
+
+    --instance-os-user ubuntu \
+
+    --ssh-public-key <your_public_awskey>
+``` 
+ 
+- Login with the key 
+
+```
+ssh ubuntu@<public_ip> -i <path_to_aws_private_key>
+``` 
+
 ## Tips:
 
 1. Always switch to the storage provided by the EC2 Instance provide conda prefix 
@@ -197,34 +226,6 @@ resource "aws_iam_user_policy_attachment" "attach_ec2_instance_connect" {
 }
 ```
 
-
-# User Login Procedure 
-
-- Make the key read only 
-
-```
-chmod 400 <path_to_aws_private_key>
-```
- 
-- Send the public key to the AWS instance 
-
-```
-    aws ec2-instance-connect send-ssh-public-key \
-
-    --instance-id <instance_id>  \
-
-    --availability-zone ap-south-1a \ 
-
-    --instance-os-user ubuntu \
-
-    --ssh-public-key <your_public_awskey>
-``` 
- 
-- Login with the key 
-
-```
-ssh ubuntu@<public_ip> -i <path_to_aws_private_key>
-``` 
 
 5. OneDrive direct download 
 
