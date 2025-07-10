@@ -134,6 +134,26 @@ ssh ubuntu@<public_ip> -i <path_to_aws_private_key>
 ``` 
 
 ## Tips:
+0. **Add to your bashrc (after you connect the EBS instance)**
+
+```
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/mnt/data/miniconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/mnt/data/miniconda/etc/profile.d/conda.sh" ]; then
+        . "/mnt/data/miniconda/etc/profile.d/conda.sh"
+    else
+        export PATH="/mnt/data/miniconda/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+```
 
 1. Always switch to the storage provided by the EC2 Instance provide conda prefix 
 `conda create --prefix /your/custom/path/myenv python=3.10` 
@@ -243,3 +263,17 @@ wget  "<link>&download=1"
 sudo mkdir -p /mnt/data
 sudo mount /dev/xvdf /mnt/data
 ```
+
+7. Edit terraform state to remove persistent storage from destory plan 
+
+```
+terraform state rm aws_ebs_volume.persistent_data
+terraform state rm aws_volume_attachment.app_server_data
+```
+
+or target to destroy 
+
+
+```
+terraform destroy -target=aws_instance.app_server -target=aws_security_group.allow_ssh -target=aws_internet_gateway.gw ...
+`` 

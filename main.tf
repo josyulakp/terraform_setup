@@ -153,22 +153,30 @@ resource "aws_iam_user_policy_attachment" "attach_ec2_instance_connect" {
   policy_arn = aws_iam_policy.ec2_instance_connect.arn
 }
 
-# Persistent EBS Volume
-resource "aws_ebs_volume" "persistent_data" {
-  availability_zone = aws_subnet.main.availability_zone
-  size              = 500 # Size in GB, adjust as needed
-  type              = "gp3"
-  tags = {
-    Name = "PersistentDataVolume"
-  }
-}
+### UNCOMMENT TO MAKE EBS PERSISTENT STORAGE 
+### YOU CAN LATER GET THE ID AND PLACE IN THE NEXT BLOCK
+### Persistent EBS Volume
+
+# resource "aws_ebs_volume" "persistent_data" {
+#   availability_zone = aws_subnet.main.availability_zone
+#   size              = 500 # Size in GB, adjust as needed
+#   type              = "gp3"
+#   tags = {
+#     Name = "PersistentDataVolume"
+#   }
+
+#   lifecycle {
+#     prevent_destroy = true
+#  }
+# }
 
 #Attach EBS Volume to the EC2 Instance device has been formatted to ext4
 #sudo mkdir -p /mnt/data
 #sudo mount /dev/xvdf /mnt/data
+
 resource "aws_volume_attachment" "app_server_data" {
   device_name = "/dev/xvdf"
-  volume_id   = aws_ebs_volume.persistent_data.id
+  volume_id   =  "vol-061ee33691597405b" #aws_ebs_volume.persistent_data.id ## USE THIS IF YOU WANT TO ATTACH A NEWLY CREATED VOLUME
   instance_id = aws_instance.app_server.id
   force_detach = true
 }
