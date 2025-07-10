@@ -102,11 +102,13 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   role = aws_iam_role.ec2_role.name
 }
 
+###useful AMIs
+##L40 old: "ami-0140f55e7363d9486" # t2micro "ami-021a584b49225376d" DL-Ubuntu22.04: "ami-0bdea0bb64cf0f044"
+## EC2 Instance (update your resource to use subnet and security group)
 
-# EC2 Instance (update your resource to use subnet and security group)
 resource "aws_instance" "app_server" {
-  ami                    =  "ami-021a584b49225376d" #"ami-0140f55e7363d9486"
-  instance_type          =  "t2.micro" #"g6.xlarge"
+  ami                    = "ami-021a584b49225376d" 
+  instance_type          = "t2.micro" #"g6.xlarge"  # 
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.allow_ssh.id]
   key_name               = "apsouthkey"
@@ -123,16 +125,6 @@ resource "aws_instance" "app_server" {
   tags = {
     Name = "L40Instance"
   }
-}
-
-output "instance_public_ip" {
-  description = "The public IP address of the EC2 instance."
-  value       = aws_instance.app_server.public_ip
-}
-
-output "instance_id"{ 
-  description = "Instance id of the EC2 instance" 
-  value = aws_instance.app_server.id
 }
 
 resource "aws_iam_policy" "ec2_instance_connect" {
@@ -160,3 +152,54 @@ resource "aws_iam_user_policy_attachment" "attach_ec2_instance_connect" {
   user       = "JeeveshM" # Replace with your IAM user name
   policy_arn = aws_iam_policy.ec2_instance_connect.arn
 }
+
+# Persistent EBS Volume
+resource "aws_ebs_volume" "persistent_data" {
+  availability_zone = aws_subnet.main.availability_zone
+  size              = 500 # Size in GB, adjust as needed
+  type              = "gp3"
+  tags = {
+    Name = "PersistentDataVolume"
+  }
+}
+
+#Attach EBS Volume to the EC2 Instance device has been formatted to ext4
+#sudo mkdir -p /mnt/data
+#sudo mount /dev/xvdf /mnt/data
+resource "aws_volume_attachment" "app_server_data" {
+  device_name = "/dev/xvdf"
+  volume_id   = aws_ebs_volume.persistent_data.id
+  instance_id = aws_instance.app_server.id
+  force_detach = true
+}
+
+
+output "instance_public_ip" {
+  description = "The public IP address of the EC2 instance."
+  value       = aws_instance.app_server.public_ip
+}
+
+output "instance_id"{ 
+  description = "Instance id of the EC2 instance" 
+  value = aws_instance.app_server.id
+}
+
+# Example: Attach the same EBS volume to another instance (uncomment and use as needed)
+# resource "aws_instance" "app_server2" {
+#   ami                    = "ami-0140f55e7363d9486"
+#   instance_type          = "t2.micro"
+#   subnet_id              = aws_subnet.main.id
+#   vpc_security_group_ids = [aws_security_group.allow_ssh.id]
+#   key_name               = "aws-keypair"
+#   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+#   tags = {
+#     Name = "SecondInstance"
+#   }
+# }
+#
+# resource "aws_volume_attachment" "app_server2_data" {
+#   device_name = "/dev/xvdf"
+#   volume_id   = aws_ebs_volume.persistent_data.id
+#   instance_id = aws_instance.app_server2.id
+#   force_detach = true
+# }
