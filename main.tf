@@ -107,8 +107,8 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 ## EC2 Instance (update your resource to use subnet and security group)
 
 resource "aws_instance" "app_server" {
-  ami                    = "ami-021a584b49225376d" 
-  instance_type          = "t2.micro" #"g6.xlarge"  # 
+  ami                    =  "ami-0140f55e7363d9486" 
+  instance_type          =  "g6.xlarge"  #"t2.micro" 
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.allow_ssh.id]
   key_name               = "apsouthkey"

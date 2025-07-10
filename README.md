@@ -277,3 +277,7 @@ or target to destroy
 ```
 terraform destroy -target=aws_instance.app_server -target=aws_security_group.allow_ssh -target=aws_internet_gateway.gw ...
 `` 
+
+8. Copying data to the instance with key example: 
+
+```rsync -chavzP --stats -e "ssh -i ~/.ssh/apsouthkey.pem" franka_recordings/ ubuntu@65.0.74.61:/mnt/data/``
