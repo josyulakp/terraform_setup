@@ -237,3 +237,9 @@ resource "aws_iam_user_policy_attachment" "attach_ec2_instance_connect" {
 wget  "<link>&download=1"
 ```
 
+6. Attach EBS Volume to the EC2 Instance device has been (500GB has been formatted to ext4 before DO NOT REFORMAT IT WILL ERASE THE DATA) 
+
+```
+sudo mkdir -p /mnt/data
+sudo mount /dev/xvdf /mnt/data
+```
