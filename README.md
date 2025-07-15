@@ -281,3 +281,12 @@ terraform destroy -target=aws_instance.app_server -target=aws_security_group.all
 8. Copying data to the instance with key example: 
 
 ```rsync -chavzP --stats -e "ssh -i ~/.ssh/apsouthkey.pem" franka_recordings/ ubuntu@65.0.74.61:/mnt/data/``
+
+9. Spot Instance creation: 
+Include spot in the `instance_market_options`  
+
+```
+  instance_market_options {
+    market_type = "spot"
+  }
+``` 
