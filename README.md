@@ -128,7 +128,7 @@ chmod 400 <path_to_aws_private_key>
     --ssh-public-key <your_public_awskey>
 ``` 
  
-- Login with the key 
+- Login with the key - Root use
 
 ```
 ssh ubuntu@<public_ip> -i <path_to_aws_private_key>
