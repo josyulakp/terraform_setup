@@ -106,6 +106,7 @@ aws ec2 modify-volume --volume-id vol-xxxxxxxx --size <NEW_SIZE_IN_GB>
 
 
 ## User Login Procedure 
+-Ask Admin to create AWS Access Key from the IAM->users->access key get 
 
 - Make the key read only 
 
