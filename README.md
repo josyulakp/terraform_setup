@@ -116,6 +116,12 @@ chmod 400 <path_to_aws_private_key>
  
 - Send the public key to the AWS instance 
 
+v1
+```
+aws ec2-instance-connect ssh --instance-id <instance-id> --os-user ubuntu
+```
+
+v2:
 ```
     aws ec2-instance-connect send-ssh-public-key \
 
